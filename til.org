@@ -1,0 +1,98 @@
+#+TITLE: Today I learned
+
+* Day 1
+** Reading in files
+
+I learned how to use the ~resources~ folder to place my input.txt files in. First I had to add the ~resources~ folder to the class path.
+
+You do this in ~deps.edn~
+
+#+begin_src clojure
+{:paths ["src" "resources"]}
+#+end_src
+
+Now Java knows where the resources file is.
+
+Next we use ~clojure.java.io~ to read in the file.
+
+#+begin_src clojure
+;; storing day1 input in day1.txt
+(->> io/resource "day1.txt"
+     io/reader)
+#+end_src
+
+This reader will take the file and create a ~java.io.BufferedReader~ object. We can pass this to ~line-seq~ to turn it into a sequence of strings.
+
+#+begin_src clojure
+(->> io/resource "day1.txt"
+     io/reader
+     line-seq
+     (mapv #(Long/parseLong %)))
+#+end_src
+
+Now we can map over it and turn the strings to numbers, returning a ~vector~.
+
+** General Approach
+
+I figured that I needed to map the values into their respective windows and then count how many windows increased. I did it like this originally:
+
+#+begin_src clojure
+(defn count-increased [col]
+  (reduce-kv (fn [count index value]
+               (if (< value (nth col (inc index) -1))
+                 (inc count)
+                 count))
+             initial-count col))
+
+(count-increased (into [] (remove nil? (map-indexed (fn [index n]
+                                                      (let [n2 (nth input (inc index) nil)
+                                                            n3 (nth input (inc (inc index)) nil)]
+                                                        (when (and (some? n2)
+                                                                   (some? n3))
+                                                          (+ n n2 n3)))) input))))
+#+end_src
+
+This the problem is that we are going over the whole input in 2 passes when it can be done in one. So I combined it to one reduce:
+
+#+begin_src clojure
+(defn optimized [col]
+  (reduce-kv (fn [count index value]
+               (let [value2 (nth col (inc index) nil)
+                     value3 (nth col (inc (inc index)) nil)
+                     value4 (nth col (inc (inc (inc index))) nil)
+                     window1 (add-not-nil value value2 value3)
+                     window2 (add-not-nil value2 value3 value4)]
+                 (if (and  (not (nil? window1)) (not (nil? window2)))
+                   (if (< window1 window2)
+                     (inc count)
+                     count)
+                   count))) 0 col))
+
+(optimized input)
+#+end_src
+
+Theres a whole bunch of let bindings to find the next values in the collection, then I have to build the two windows for part 2. I have to account for ~nil~ values because you cant pass ~nil~ to ~+~. I was relatively happy with this and then I looked at some of the clojurian slack answers.
+
+** Use ~apply~ and ~partition~
+
+The biggest problem with my solution is I'm doing a bunch of things manually like getting the next values in the sequence and then comparing them individually.
+
+Using ~apply~ and ~partition~ you can reduce the lines of code for ~count-increased~ drastically:
+
+#+begin_src clojure
+(defn new-count-increased [col] (count (filter #(apply < %) (partition 2 1 col))))
+#+end_src
+
+We can use partition to create the data structure we really want... so from ~[1 2 3 4]~ to ~((1 2) (2 3) (3 4))~. Notice this doesnt create any nil values to protect against. The second number passed to ~partition~ is the ~padding~, basically how many numbers the next collection starts from the first collection (no pad means there is no overlap).
+
+Then we ~filter~ for all the pairs where the first depth is less than the second. We can use ~apply~ to drop down into the collection and apply that method to the params that ~filter~ passes us.
+
+Then we just ~count~ how many times that happened!
+
+For the second part, you can use ~partition~ again to create the windows and then sum those partitions up and pass that collection into our now function.
+
+#+begin_src clojure
+(new-count-increased (map #(apply + %) (partition 3 1 input)))
+#+end_src
+
+~apply~ is doing the heavy lifting of adding the partitions up.
