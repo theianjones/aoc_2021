@@ -1,6 +1,6 @@
 (ns theianjones.aoc-2021.d01.answer
   (:require
-   [theianjones.aoc-2021.d01.data :refer [input]]))
+   [clojure.java.io :as io]))
 
 (def example [199
               200
@@ -13,6 +13,12 @@
               260
               263])
 
+(def input
+  (->>
+   (io/resource "day1.txt")
+   io/reader
+   line-seq
+   (mapv #(Long/parseLong %))))
 ;; scratch pad
 
 (reduce-kv (fn [count index value] (if (< value (nth [1 2 3 4] (inc index) 0))
@@ -75,6 +81,6 @@
 
 (increased-count example)
 
-(def puzzle1 (increased-count input))
+(increased-count input)
 
 (def puzzle2 (increased-count (map #(apply + %) (partition 3 1 input))))
