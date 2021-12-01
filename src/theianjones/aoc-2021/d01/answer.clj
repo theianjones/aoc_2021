@@ -33,6 +33,7 @@
 
 ;; the real answer
 
+;; this will take any collection and cound how many times (< (nth col n) (nth col (inc n))) has increased
 (defn count-increased [col]
   (reduce-kv (fn [count index value]
                (if (< value (nth col (inc index) -1))
@@ -52,6 +53,8 @@
 
 (add-not-nil 1 2)
 
+;; I realized that you can just build the windows as you go to avoid multiple iterations
+;; I havent tested either of the solutions so dont really know which is faster
 (defn optimized [col]
   (reduce-kv (fn [count index value]
                (let [value2 (nth col (inc index) nil)
