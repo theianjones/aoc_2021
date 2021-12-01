@@ -15,12 +15,7 @@
 
 ;; scratch pad
 
-(defn increased? [a b]
-  (< a b))
-
-(increased? 199 200)
-
-(reduce-kv (fn [count index value] (if (increased? value (nth [1 2 3 4] (inc index) 0))
+(reduce-kv (fn [count index value] (if (< value (nth [1 2 3 4] (inc index) 0))
                                      (inc count)
                                      count)) 0 [1 2 3 4])
 (def initial-count 0)
@@ -69,3 +64,15 @@
                    count))) 0 col))
 
 (optimized input)
+
+;; looked at community solutions
+;; 2 key things i missed
+;; apply: being able to apply a function to a collection
+;; partition: being able to split up a collection into sub collections
+;;
+
+(defn increased-count [col] (count (filter #(apply < %) (partition 2 1 col))))
+
+(increased-count example)
+
+(increased-count (map #(apply + %) (partition 3 1 input)))
