@@ -46,3 +46,23 @@
                                                         (when (and (some? n2)
                                                                    (some? n3))
                                                           (+ n n2 n3)))) input))))
+
+(defn add-not-nil [& col]
+  (when (not (some nil? col)) (reduce + col)))
+
+(add-not-nil 1 2)
+
+(defn optimized [col]
+  (reduce-kv (fn [count index value]
+               (let [value2 (nth col (inc index) nil)
+                     value3 (nth col (inc (inc index)) nil)
+                     value4 (nth col (inc (inc (inc index))) nil)
+                     window1 (add-not-nil value value2 value3)
+                     window2 (add-not-nil value2 value3 value4)]
+                 (if (and  (not (nil? window1)) (not (nil? window2)))
+                   (if (< window1 window2)
+                     (inc count)
+                     count)
+                   count))) 0 col))
+
+(optimized input)
