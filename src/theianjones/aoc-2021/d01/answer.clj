@@ -75,4 +75,6 @@
 
 (increased-count example)
 
-(increased-count (map #(apply + %) (partition 3 1 input)))
+(def puzzle1 (increased-count input))
+
+(def puzzle2 (increased-count (map #(apply + %) (partition 3 1 input))))
