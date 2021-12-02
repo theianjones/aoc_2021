@@ -24,21 +24,21 @@
 
 (def position (atom {:depth 0 :distance 0}))
 
-(defn set-position [key value]
-  (swap! position assoc key (+ value (get @position key))))
+(defn set-position [state key value]
+  (assoc state key (+ value (get state key))))
 
-(set-position :depth 1)
+(set-position {:depth 0 :distance 0} :depth 1)
 
 (- 1)
 
-(defn move-submarine [[key value]]
+(defn move-submarine [state [key value]]
   (case key
-    :forward (set-position :distance value)
-    :up (set-position :depth (- value))
-    :down (set-position :depth value)))
+    :forward (set-position state :distance value)
+    :up (set-position state :depth (- value))
+    :down (set-position state :depth value)))
 
 (run! move-submarine example)
 
-(run! move-submarine input)
-
-(* (:depth @position) (:distance @position))
+(let [result (reduce move-submarine {:depth 0 :distance 0} input)
+      answer1 (* (:depth result) (:distance result))]
+  answer1)
