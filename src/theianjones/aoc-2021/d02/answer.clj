@@ -39,8 +39,13 @@
 
 (run! move-submarine example)
 
+;; Ive been wanting to use Juxt lol
+;; found this in Borkdudes answer
+;; https://gist.github.com/borkdude/b5cf0e9d2d8ab7c678d88e27a3357b33#file-aoc21_02-clj
 (defn calculate-answer [state]
-  (* (:depth state) (:distance state)))
+  (->> state
+       ((juxt :depth :distance))
+       (apply *)))
 
 (let [result (reduce move-submarine {:depth 0 :distance 0} input)
       answer1 (calculate-answer result)]
@@ -56,4 +61,13 @@
     :up (set-position state :aim (- value))
     :down (set-position state :aim value)))
 
+;; non threaded
 (calculate-answer (reduce move-submarin-2 {:depth 0 :distance 0 :aim 0} input))
+
+(def initial-positions
+  {:depth 0 :distance 0 :aim 0})
+
+;; threaded!
+(->> input
+     (reduce move-submarin-2 initial-positions)
+     calculate-answer)
