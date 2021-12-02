@@ -42,9 +42,11 @@
 
 (defn move-submarin-2 [state [direction value]]
   (case direction
+    ;; changed this to use a thread
+    ;; dont need a let anymore
     :forward (-> state
                  (update :distance + value)
-                 (update :depth + (* value (:aim state))))
+                 (update :depth + (* value (:aim state)))) ;; dont need an if here, if the aim is 0 then the depth wont change
     :up (update state :aim - value)
     :down (update state :aim + value)))
 
