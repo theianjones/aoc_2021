@@ -96,3 +96,26 @@ For the second part, you can use ~partition~ again to create the windows and the
 #+end_src
 
 ~apply~ is doing the heavy lifting of adding the partitions up.
+* Day 2
+** learning more core functions
+I created a solution [[https://github.com/theianjones/aoc_2021/blob/89f32e5de02b7265b86189273ae64f62cff259c5/src/theianjones/aoc-2021/d02/answer.clj][here]] that uses my own ~set-position~ function. It basically takes a map, key, and value and updates that map key with whatever value I passed it.
+
+#+begin_src clojure
+(defn set-position [state key value]
+  (assoc state key (+ value (get state key))))
+
+(set-position {:depth 0 :distance 0} :depth 1)
+;; => {:depth 1 :distance 0}
+#+end_src
+
+Then I looked at [[https://gist.github.com/borkdude/b5cf0e9d2d8ab7c678d88e27a3357b33#file-aoc21_02-clj][Borkdude's solution]] and he is using ~update~ for this purpose! It does almost exactly what I intended. It takes an "associative structure", a key and a function to apply to that key to apply the function to. The function talks the current value in the structure and any other args you passed.
+
+#+begin_src clojure
+(update {:depth 0 :distance 0} :depth + 1)
+;; => {:depth 1 :distance 0}
+#+end_src
+
+This allowed me to delete a function and use clojure.core!
+** ~->~ and ~->>~ are more readable
+
+Im not used to using the thread macros but they make things a lot easier to read. The mental model is "heres the input and then the sequential functions to apply to that input". Its like ~|~ piping in bash.
