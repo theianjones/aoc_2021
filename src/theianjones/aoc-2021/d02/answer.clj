@@ -39,6 +39,21 @@
 
 (run! move-submarine example)
 
+(defn calculate-answer [state]
+  (* (:depth state) (:distance state)))
+
 (let [result (reduce move-submarine {:depth 0 :distance 0} input)
-      answer1 (* (:depth result) (:distance result))]
+      answer1 (calculate-answer result)]
   answer1)
+
+(defn move-submarin-2 [state [key value]]
+  (case key
+    :forward (let [newForwardState (set-position state :distance value)
+                   currentAim (:aim state)]
+               (if (> currentAim 0)
+                 (set-position newForwardState :depth (* value currentAim))
+                 newForwardState))
+    :up (set-position state :aim (- value))
+    :down (set-position state :aim value)))
+
+(calculate-answer (reduce move-submarin-2 {:depth 0 :distance 0 :aim 0} input))
