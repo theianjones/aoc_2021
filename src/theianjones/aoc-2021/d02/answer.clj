@@ -22,22 +22,11 @@
               [:down 8]
               [:forward 2]])
 
-(def position (atom {:depth 0 :distance 0}))
-
-(defn set-position [state key value]
-  (assoc state key (+ value (get state key))))
-
-(set-position {:depth 0 :distance 0} :depth 1)
-
-(- 1)
-
-(defn move-submarine [state [key value]]
-  (case key
-    :forward (set-position state :distance value)
-    :up (set-position state :depth (- value))
-    :down (set-position state :depth value)))
-
-(run! move-submarine example)
+(defn move-submarine [state [direction value]]
+  (case direction
+    :forward (update state :distance + value)
+    :up (update state :depth  - value)
+    :down (update state :depth + value)))
 
 ;; Ive been wanting to use Juxt lol
 ;; found this in Borkdudes answer
@@ -51,15 +40,13 @@
       answer1 (calculate-answer result)]
   answer1)
 
-(defn move-submarin-2 [state [key value]]
-  (case key
-    :forward (let [newForwardState (set-position state :distance value)
-                   currentAim (:aim state)]
-               (if (> currentAim 0)
-                 (set-position newForwardState :depth (* value currentAim))
-                 newForwardState))
-    :up (set-position state :aim (- value))
-    :down (set-position state :aim value)))
+(defn move-submarin-2 [state [direction value]]
+  (case direction
+    :forward (-> state
+                 (update :distance + value)
+                 (update :depth + (* value (:aim state))))
+    :up (update state :aim - value)
+    :down (update state :aim + value)))
 
 ;; non threaded
 (calculate-answer (reduce move-submarin-2 {:depth 0 :distance 0 :aim 0} input))
