@@ -8,24 +8,21 @@
   (apply str col))
 
 (def example (map (partial apply to-binary-string) (u/read-resource "day3example.txt")))
+(def input (map (partial apply to-binary-string) (u/read-resource "day3.txt")))
 
 (defn to-int-seq [s]
   (map #(Long/parseLong %) (str/split s #"")))
 
-(map #(if (> % (/ (count example) 2)) 1 0)
-     (apply map + (map to-int-seq example)))
-
-(defn count-bits [[& col]])
-
-(defn sort-bytes [col]
-  (map #(sort-by (fn [char] (if (= char \0) 0 1)) %) col))
-
-(def part-bytes (partial partition-by #(= \0 %)))
-
-(map part-bytes (sort example))
+(defn get-rates [col]
+  (let [gamma (map #(if (> % (/ (count col) 2)) 1 0)
+                   (apply map + (map to-int-seq col)))
+        epsilon (map #(if (= 0 %) 1 0) gamma)]
+    [(apply str gamma) (apply str epsilon)]))
 
 (defn parse-binary
   [s]
   (try
     (Long/parseLong s 2)
     (catch Exception _)))
+
+(apply * (map parse-binary (get-rates input)))
