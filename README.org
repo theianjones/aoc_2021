@@ -119,3 +119,59 @@ This allowed me to delete a function and use clojure.core!
 ** ~->~ and ~->>~ are more readable
 
 Im not used to using the thread macros but they make things a lot easier to read. The mental model is "heres the input and then the sequential functions to apply to that input". Its like ~|~ piping in bash.
+* Day 3
+
+Today was all about breaking the larger problem into smaller pieces. It was a recursion problem, so I had to learn about ~loop/recur~.
+
+** ~loop~/~recur~
+
+Todays solution required looping over the input collection ~n~ amount of times when ~n~ is the length of the binary number passed in. So ~00101~ would require 5 loops.
+
+For each ~n~ column in the bitwise numbers I had to do a couple things:
+
+- find the most common bit in that column ~1~ or ~0~
+- filter the input by the most common bit found
+
+#+begin_src clojure
+(defn filter-ratings [col n pred]
+  (let [threshold (/ (count col) 2)
+        positive-bit-count (nth (apply map + col) n)
+        rating-filter (if (pred positive-bit-count threshold) 1 0)]
+    (filter #(= (nth % n) rating-filter) col)))
+#+end_src
+
+I found the most common bit by:
+
+- finding the total bitwise number count
+- counting how many ~1~ there are in that column
+- then applying ~(if (pred positive-bit-count threshold) 1 0)~ to find which bit I need to filter by
+
+This is what I have to do for each column in the bitwise number. So given our previous number ~00101~ I would have to do this 5 times.
+
+~loop~ lets you define which variables are tracked across the recursion. Here I need to track which bit column Im on and the result of running ~get-ratings~.
+
+You can see the base case for this is whether ~n~ has increased to the count of the ~col~ (this would mean somethings broken) or if there is 1 item in ~result~.
+
+If there is I need to flatten it because it will be a seq in a seq ~((000101))~. Then I need to turn it back to a string.
+
+#+begin_src clojure
+(defn find-rating [pred col]
+  (loop [n 1
+         result (filter-ratings (map to-int-seq col) 0 pred)]
+    (if (or (= (count col) n) (= (count result) 1))
+      (apply str (flatten result))
+      (recur (inc n) (filter-ratings result n pred)))))
+
+#+end_src
+
+Now we can create our 2 different ratings and find the answer:
+
+#+begin_src clojure
+(def oxygen-rating (partial find-rating >=))
+(def c02-rating (partial find-rating <))
+
+(->> input
+     ((juxt oxygen-rating c02-rating))
+     (map parse-binary)
+     (apply *))
+#+end_src
