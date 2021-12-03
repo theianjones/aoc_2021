@@ -121,9 +121,9 @@ This allowed me to delete a function and use clojure.core!
 Im not used to using the thread macros but they make things a lot easier to read. The mental model is "heres the input and then the sequential functions to apply to that input". Its like ~|~ piping in bash.
 * Day 3
 
-Today was all about breaking the larger problem into smaller pieces. It was a recursion problem, so I had to learn about ~loop/recur~.
+Today was all about breaking the larger problem into smaller pieces. It was a recursion problem, so I had to learn about ~loop~ / ~recur~.
 
-** ~loop~/~recur~
+** ~loop~ / ~recur~
 
 Todays solution required looping over the input collection ~n~ amount of times when ~n~ is the length of the binary number passed in. So ~00101~ would require 5 loops.
 
