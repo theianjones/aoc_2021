@@ -5,7 +5,7 @@
             [clojure.set :as set]))
 
 (def example (str/split (slurp (io/resource "day4example.txt")) #"\n\n"))
-(def input (str/split (slurp (io/resource "day4example.txt")) #"\n\n"))
+(def i (str/split (slurp (io/resource "day4.txt")) #"\n\n"))
 
 (defn str-to-ints
   [string]
@@ -18,7 +18,7 @@
     [(map #(Long/parseLong %) (str/split numbers #",")) (map (fn [board] (map #(str-to-ints %) board)) boards)]))
 
 (def example-boards (parse-input example))
-(def input-boards (parse-input input))
+(def input-boards (parse-input i))
 
 (defn winner? [input row]
   (= (count (set/intersection (set input) (set row))) (count row)))
@@ -57,8 +57,10 @@
                           boards))
           _ (prn current-input)]
       (if (or winning-board (= n (count total-input)))
-        (prn (calculate-winner winning-board current-input))
+        (calculate-winner winning-board current-input)
         (recur (inc n))))))
+
+(calculate (first input-boards) (second input-boards))
 
 (def first-board (-> example-boards
                      second
