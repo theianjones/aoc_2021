@@ -60,6 +60,26 @@
         (calculate-winner winning-board current-input)
         (recur (inc n))))))
 
+(defn get-last-winning-board [boards current-input]
+  (let [winning-boards (filter
+                        #(board-winner? % current-input) boards)]
+    (when (= (count winning-boards) (dec (count boards)))
+      (first (remove #(board-winner? % current-input) boards)))))
+
+(get-last-winning-board (second example-boards) '(7 4 9 5 11 17 23 2 0 14 21 24 10 16))
+
+(defn calculate-last-winner [total-input boards]
+  (loop [n 5
+         last-board-to-win '()]
+    (let [current-input (take n total-input)]
+      (if (or
+           (and last-board-to-win (board-winner? last-board-to-win current-input))
+           (= n (count total-input)))
+        (calculate-winner last-board-to-win current-input)
+        (recur (inc n) (get-last-winning-board boards current-input))))))
+
+(calculate-last-winner (first input-boards) (second input-boards))
+
 (calculate (first input-boards) (second input-boards))
 
 (def first-board (-> example-boards
@@ -74,3 +94,7 @@
 (range (count (first first-board)))
 
 (calculate-winner first-board '(7 4 9 5 11 17 23 2 0 14 21 24))
+
+;; fave community solutions
+;; https://github.com/tschady/advent-of-code/blob/main/src/aoc/2021/d04.clj
+;; https://github.com/nbardiuk/adventofcode/blob/master/2021/src/day04.clj
