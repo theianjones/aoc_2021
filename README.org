@@ -175,3 +175,56 @@ Now we can create our 2 different ratings and find the answer:
      (map parse-binary)
      (apply *))
 #+end_src
+* Day 6
+
+Today was learning about how to use efficient data structures. There are only 9 types of unique fish, so you dont have to store them individually. Their day number is all that really matters.
+
+This is where ~frequencies~ can help. Given the example input:
+
+#+begin_src clojure
+(def example [3 4 3 1 2])
+
+(frequencies example)
+;; => {3 2, 4 1, 1 1, 2 1}
+#+end_src
+
+We can see how ~frequencies~ will count up the type of fish we want.
+
+The next important idea is that we need to ~iterate~ for ~n~ days. Clojure gives us this function where it will call the same function with passing the returned value to the next call.
+
+A simple example:
+
+#+begin_src clojure
+(nth (iterate inc 0) 10)
+;; => 10
+#+end_src
+
+It will keep applying ~f~ to ~x~ so in this example we get ~(inc (inc (inc (inc (inc (inc (inc (inc (inc (inc 0))))))))))~. You can see why this is useful.
+
+Given our fishies example above, we can create a step function to pass to our ~iterate~ call to multiply the fishies per the rules
+
+#+begin_src clojure
+(defn day [fishies]
+  (reduce (fn [new-fishies [fish-days total-fish]]
+               (if (zero? fish-days)
+                 (-> new-fishies
+                     (update 6 (fnil + 0) total-fish)
+                     (update 8 (fnil + 0) total-fish)
+                     (update 0 (fnil - 0) total-fish))
+                 (-> new-fishies
+                     (update fish-days (fnil - 0) total-fish)
+                     (update (dec fish-days) (fnil + 0) total-fish)))) fishies fishies))
+
+(nth (iterate day (frequencies example)) 80)
+;; => {0 424, 7 370, 1 729, 4 739, 6 991, 3 790, 2 558, 5 762, 8 571}
+#+end_src
+
+After 80 days, you can see that we have a lot of fish! Now we can get the values, and add them up to get the total:
+
+#+begin_src clojure
+(-> (iterate day (frequencies example))
+    (nth 80)
+    (vals)
+    (->> (apply +)))
+;; => 5934
+#+end_src
