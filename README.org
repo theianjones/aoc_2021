@@ -177,6 +177,19 @@ Now we can create our 2 different ratings and find the answer:
 #+end_src
 * Day 6
 
+Original solution:
+
+#+begin_src clojure
+(defn day [fishies]
+ (reduce-kv (fn [new-fishies index fish]
+              (if (zero? fish)
+                (conj (update new-fishies index (fn [_] 6)) 8)
+                (update new-fishies index dec))) fishies fishies))
+
+#+end_src
+
+This worked for the first part because 80 days isnt a huge number. But adding a number to the array every time for 256 iterations becomes out of control.
+
 Today was learning about how to use efficient data structures. There are only 9 types of unique fish, so you dont have to store them individually. Their day number is all that really matters.
 
 This is where ~frequencies~ can help. Given the example input:
