@@ -44,6 +44,33 @@
   (conj (update (subvec fishes 1) 6 + (first fishes))
         (first fishes)))
 
-(conj (update (subvec (parse "1,1,1,1,1,1,0,0,0,0,0,2,3,4,5,6,7") 1) 6 + (first (parse rawexample))) (first (parse "1,1,1,1,1,1,0,0,0,0,0,2,3,4,5,6,7")))
+(conj (update (subvec (parse "0,1,2,4,4,5,5,5") 1) 6 + (first (parse rawexample))) (first (parse "1,2,4,4,5,5,5,0")))
 
-(nth (iterate step (parse rawexample)) 80)
+(def fishes-0 (parse rawexample))
+;; => [0 1 1 2 1 0 0 0 0]
+(subvec fishes-0 1)
+;; => [1 1 2 1 0 0 0 0]
+(update (subvec fishes-0 1) 6 + (first fishes-0))
+;; => [1 1 2 1 0 0 0 0]
+(conj (update (subvec fishes-0 1) 6 + (first fishes-0))
+      (first fishes-0))
+;; => [1 1 2 1 0 0 0 0 0]
+(def fishes-2 [1 2 1 0 0 0 1 0 1])
+(subvec fishes-2 1)
+;; => [2 1 0 0 0 1 0 1]
+(update (subvec fishes-2 1) 6 + (first fishes-2))
+;; => [2 1 0 0 0 1 1 1]
+(conj (update (subvec fishes-2 1) 6 + (first fishes-2))
+      (first fishes-2))
+;; => [2 1 0 0 0 1 1 1 1]
+;
+(def fishes-3 [2 1 0 0 0 1 1 1 1])
+(subvec fishes-3 1)
+;; => [1 0 0 0 1 1 1 1]
+(update (subvec fishes-3 1) 6 + (first fishes-3))
+;; => [1 0 0 0 1 1 3 1]
+(conj (update (subvec fishes-3 1) 6 + (first fishes-3))
+      (first fishes-3))
+;; => [1 0 0 0 1 1 3 1 2]
+;;
+(nth (iterate step (parse rawexample)) 9)
